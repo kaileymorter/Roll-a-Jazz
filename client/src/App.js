@@ -5,25 +5,29 @@ import { GlobalStyles } from "./components/GlobalStyles";
 import { lightTheme, darkTheme } from "./components/Theme";
 import Toggle from "./components/Toggler";
 import "./index.css";
+import Auth from "./utils/auth";
 import { ApolloProvider } from "@apollo/react-hooks";
 import ApolloClient from "apollo-boost";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from "react-router-dom";
 import Login from "./pages/Login";
 import NoMatch from "./pages/NoMatch";
-import Profile from "./pages/Profile";
+// import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import Collection from "./pages/Collection";
 import Create from "./pages/Create";
-import Contact from './pages/Contact'
-
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Contact from "./pages/Contact";
+import Header from "./components/Header"
+import Footer from "./components/Footer"
 
 import Cards from "./pages/Cards";
 import Home from "./pages/Home";
-import { Provider } from 'react-redux';
-import store from './utils/store';
-
+import { Provider } from "react-redux";
+import store from "./utils/store";
 
 const client = new ApolloClient({
   // retrieves token from local storage
@@ -59,20 +63,35 @@ function App() {
 
                   <Switch>
                     <Route exact path="/" component={Home} />
-                    <Route exact path="/cards" component={Cards} />
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/signup" component={Signup} />
-                    <Route exact path="/create" component={Create} />
-                    <Route exact path="/collection" component={Collection} />
-                    <Route
-                      exact
-                      path="/profile:username?"
-                      component={Profile}
-                    />
-                    {/* <Route exact path="/single-card" component={SingleCard} /> */}
                     <Route exact path="/contact" component={Contact} />
-
-                    <Route component={NoMatch} />
+                    
+                    {Auth.loggedIn() ? (
+                      <Route exact path="/cards" component={Cards} />
+                    ) : (
+                      <Redirect to={{ pathname: "/login" }} />
+                    )}
+                    {Auth.loggedIn() ? (
+                      <Route exact path="/create" component={Create} />
+                    ) : (
+                      <Redirect to={{ pathname: "/login" }} />
+                    )}
+                    {Auth.loggedIn() ? (
+                      <Route exact path="/collection" component={Collection} />
+                    ) : (
+                      <Redirect to={{ pathname: "/login" }} />
+                    )}
+                    {/* {Auth.loggedIn() ? (
+                      <Route
+                        exact
+                        path="/profile:username?"
+                        component={Profile}
+                      />
+                    ) : (
+                      <Redirect to={{ pathname: "/login" }} />
+                    )} */}
+                    {Auth.loggedIn() && <Route component={NoMatch} />}
                   </Switch>
                 </div>
                 <Footer />
